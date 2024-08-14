@@ -1,23 +1,16 @@
-import logo from './logo.svg';
-import './App.css';
+import LoginPage from './components/loginPage/loginPage';
+import { useState } from 'react';
+import MainPage from './components/mainPage/MainPage';
 
 function App() {
+  const [loggedIn, setLoggedIn] = useState(false);
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React 
-        </a>
-      </header>
+      <div className="backg-black" style={{height:"100vh", width:"100vw",backgroundColor:"black"}}>
+      {!loggedIn 
+      ? <LoginPage setLoggedIn={setLoggedIn}/>
+      : <MainPage />
+      }
+      
     </div>
   );
 }
