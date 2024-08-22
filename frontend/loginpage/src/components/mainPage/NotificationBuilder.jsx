@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Notification from './Notification';
+import msgRecieve from '../serverDelegate/MsgReciever';
 
 
 export default function NotificationBuilder(params) {
@@ -24,6 +25,12 @@ export default function NotificationBuilder(params) {
         msg:""
       }
      */}
+
+     useEffect(() => {
+       //msgRecieve(setNotificationList);
+     
+     }, []);
+     
 
      const removeNotification =(id)=>{
         setNotificationList((prev)=>{

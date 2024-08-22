@@ -3,7 +3,7 @@ import { useState } from 'react';
 import MainPage from './components/mainPage/MainPage';
 
 function App() {
-  const [loggedIn, setLoggedIn] = useState(true);
+  const [loggedIn, setLoggedIn] = useState(false);
   return (
       <div className="backg-black" style={{height:"100vh", width:"100vw",backgroundColor:"black"}}>
       {!loggedIn 

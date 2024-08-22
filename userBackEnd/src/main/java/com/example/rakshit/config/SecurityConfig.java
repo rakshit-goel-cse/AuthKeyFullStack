@@ -1,4 +1,4 @@
-package com.example.rakshit;
+package com.example.rakshit.config;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -17,7 +17,8 @@ public class SecurityConfig  {
 	            		
 	            		).csrf(config->{
 	            			config.disable();
-	            		});
+	            		})
+	            		.headers(t -> t.frameOptions(f -> f.sameOrigin()));
 	   return http.build();
 	 }
 }
