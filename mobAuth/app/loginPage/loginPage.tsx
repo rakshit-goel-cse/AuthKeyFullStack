@@ -1,14 +1,27 @@
-import * as React from 'react';
+import {useState} from 'react';
 import { Button, StyleSheet, Text, TextInput, View, KeyboardAvoidingView, Platform, TouchableWithoutFeedback, Keyboard } from 'react-native';
+import { registerUser } from '../server/userService';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 type ChildComponentProps = {
     tryLogin: (username: string,password:string) => void;
   };
 
 export default function LoginPage({tryLogin}:ChildComponentProps) {
-    const [isLogin, setIsLogin] = React.useState(true);
-    const [userName, setUserName] = React.useState("");
-    const [password, setPassword] = React.useState("");
+    const [isLogin, setIsLogin] = useState(true);
+    const [userName, setUserName] = useState("");
+    const [password, setPassword] = useState("");
+    const [showPass, setshowPass] = useState(false);
+
+    const registerNewUser = () =>{
+        console.log("trying register -- ",isLogin,userName,password);
+        if(!isLogin && null!=userName && userName && null!=password && password){
+            registerUser(userName,password);
+            setIsLogin(true);
+            setUserName("");
+            setPassword("");
+        }
+    }
 
     const loginItem = () => {
         return (
@@ -32,8 +45,17 @@ export default function LoginPage({tryLogin}:ChildComponentProps) {
                         onChangeText={setPassword}
                         style={style.userNameInput}
                         autoCapitalize='none'
-                        secureTextEntry={isLogin}
+                        secureTextEntry={isLogin && !showPass}
                     />
+                    {isLogin &&
+                    <MaterialCommunityIcons
+                        name={!showPass ? 'eye-off' : 'eye'}
+                        size={24}
+                        color="#aaa"
+                        style={style.icon}
+                        onPress={()=>setshowPass(prev=>!prev)}
+                    />}
+
                 </View>
 
                 <View style={{ flexDirection: "row", justifyContent: "space-evenly" ,marginTop:20}}>
@@ -45,7 +67,7 @@ export default function LoginPage({tryLogin}:ChildComponentProps) {
                     <Button
                         disabled={isLogin}
                         title='Register'
-                        onPress={() => { /* handle registration */ }}
+                        onPress={() => { registerNewUser() }}
                     />
                 </View>
 
@@ -105,5 +127,13 @@ const style = StyleSheet.create({
     marginTop: 20,
     fontWeight: "bold",
     color: "blue",
+  },
+  icon:{
+    position:"relative",
+    alignSelf:"flex-end",
+    marginTop:-35,
+    marginBottom:10,
+    marginRight:5,
+    zIndex:10
   }
 });

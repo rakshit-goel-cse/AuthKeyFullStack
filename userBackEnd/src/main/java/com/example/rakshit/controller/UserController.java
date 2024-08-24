@@ -68,8 +68,10 @@ public class UserController {
 			@RequestParam(name = "authkey", required = true) String key) {
 		try {
 			Users user = getUser(userName);
+			log.warn("auth key- "+key+" "+userName+" "+pass);
 			if (null!=user && user.getPassword().equals(pass)
 					&& StringUtil.notNullNorEmpty(key) && StringUtils.isNumeric(key) && key.length() == 6) {
+				//log.info("Saving key");
 				user.setSecuritykey(Integer.parseInt(key));
 				userRepository.save(user);
 				return ResponseEntity.ok("Authkey saved");
@@ -80,7 +82,7 @@ public class UserController {
 		}
 	}
 	
-	@GetMapping("/loginByPassword")
+	@PostMapping("/loginByPassword")
 	public ResponseEntity<String> loginByPassword(@RequestBody Users body){
 		try {
 			log.info("LoginByPassword "+body.toString());
