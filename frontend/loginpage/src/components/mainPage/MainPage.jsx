@@ -3,6 +3,7 @@ import NotificationBuilder from './NotificationBuilder';
 
 export default function MainPage(params) {
     const [msg, setmsg] = useState('');
+    const [mouseOverLink, setmouseOverLink] = useState(false);
     
     const sendPing = () =>{
         console.log("pinged")
@@ -31,6 +32,14 @@ export default function MainPage(params) {
             onClick={sendMsg}
             >Send</button>
         </div>
+
+        <h2 className='absolute -my-16 left-1/2 -translate-x-1/2 text-center'>For Registeration Use Mobile Auth App <br/>
+         Click <a onMouseEnter={()=>setmouseOverLink(true)}
+            onMouseLeave={()=>setmouseOverLink(false)}
+         href={'http://localhost:8080/app'}
+         className={mouseOverLink?'text-cyan-600 underline':''}
+         >here</a> to download.
+         </h2>
         </div>
     )
 }
