@@ -1,7 +1,10 @@
 package com.example.rakshit.controller;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Optional;
 
+import org.apache.catalina.util.ToStringUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.example.rakshit.models.Users;
 import com.example.rakshit.repository.UserRepository;
+import com.nimbusds.jwt.util.DateUtils;
 import com.nimbusds.oauth2.sdk.util.StringUtils;
 
 import ch.qos.logback.core.util.StringUtil;
@@ -32,6 +36,7 @@ public class UserController {
 
 	private static Logger log = LoggerFactory.getLogger(UserController.class);
 
+	private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 	
 	public Users getUser(String userName) {
 		Optional<Users> user = userRepository.findByUsername(userName);
@@ -72,7 +77,11 @@ public class UserController {
 			if (null!=user && user.getPassword().equals(pass)
 					&& StringUtil.notNullNorEmpty(key) && StringUtils.isNumeric(key) && key.length() == 6) {
 				//log.info("Saving key");
-				user.setSecuritykey(Integer.parseInt(key));
+				
+				Date d = DateUtils.nowWithSecondsPrecision();
+				String finalkey=key+String.valueOf(d.getTime());
+				
+				user.setSecuritykey(finalkey);
 				userRepository.save(user);
 				return ResponseEntity.ok("Authkey saved");
 			}
@@ -115,12 +124,28 @@ public class UserController {
 				return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Authkey is not correct");
 			}
 			Users user = getUser(body.getUsername());
-			if(null!=user && StringUtil.notNullNorEmpty(user.getPassword()) && user.getSecuritykey()==body.getSecuritykey()) {
-				return ResponseEntity.ok("loged in");
+			if(null!=user && StringUtil.notNullNorEmpty(user.getPassword())) {
+				String key = user.getSecuritykey();
+				String finalKey=null;
+				Date keyDate=null;
+				if(!StringUtil.isNullOrEmpty(key)) {
+					finalKey=key.substring(0, 6);
+					String d=key.substring(6);
+					//log.info("date to parse- "+d+" "+key);
+					keyDate = new Date(Long.parseLong(d));
+					//log.info("date bhbh-- "+keyDate+" " + new Date());
+				}
+				if(null==keyDate || !DateUtils.isBefore(new Date(), keyDate, 60)) {
+					return ResponseEntity.status(HttpStatus.CONFLICT).body("Authkey Expired");
+				}
+				if(StringUtil.notNullNorEmpty(finalKey) && finalKey.length()==6 && finalKey.equals(body.getSecuritykey())) {
+					return ResponseEntity.ok("loged in");
+				}
 			}
-			return ResponseEntity.status(HttpStatus.CONFLICT).body("AuthKey is wrong");
+			return ResponseEntity.status(HttpStatus.CONFLICT).body("User not found");
 		}
 		catch(Exception e) {
+			log.error(e.toString());
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.toString());
 		}
 	}
