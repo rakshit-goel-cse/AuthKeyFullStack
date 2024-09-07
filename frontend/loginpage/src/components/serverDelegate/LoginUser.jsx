@@ -2,7 +2,7 @@ import React from 'react';
 
 export default async function loginUser(userName,authKey) {
     console.log(userName,authKey);
-    const result = await fetch("http://192.168.29.231:8080/user/loginByKey",
+    const result = await fetch("http://localhost:8080/user/loginByKey",  
         {
             method:"POST",
             headers:{

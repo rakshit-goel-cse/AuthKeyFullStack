@@ -13,7 +13,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 	@Override
 	public void configureMessageBroker(MessageBrokerRegistry registry) {
 		registry.setApplicationDestinationPrefixes("/app");
-		registry.enableSimpleBroker("/msg");
+		registry.enableSimpleBroker("/topic");
 		registry.setUserDestinationPrefix("/msg");
 	}
 	
@@ -21,7 +21,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 	public void registerStompEndpoints(StompEndpointRegistry registry) {
 		registry.addEndpoint("/ping")
 			.setAllowedOriginPatterns("*")
-			.withSockJS();
+			.withSockJS().setDisconnectDelay(9999999);
 	}
 	
 	 

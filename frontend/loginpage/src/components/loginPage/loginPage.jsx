@@ -1,7 +1,8 @@
 import React, { useRef, useState } from "react";
 import loginUser from "../serverDelegate/LoginUser";
+import LinkQr from './LinkQr.png';
 
-export default function LoginPage({setLoggedIn}) {
+export default function LoginPage({setLoggedIn,setusername}) {
   const [userName, setuserName] = useState("");
   const [authKey, setauthKey] = useState("");
   const [buttonPos, setbuttonPos] = useState(0);
@@ -14,7 +15,8 @@ export default function LoginPage({setLoggedIn}) {
             var res=await loginUser(userName,authKey);
             console.info(res," when fetched data");
             if(res==='OK'){
-            setLoggedIn(true);
+              setLoggedIn(true);
+              setusername(userName);
             }
             else{
               seterrorMsg(res);
@@ -56,7 +58,7 @@ export default function LoginPage({setLoggedIn}) {
             onChange={(e) => setuserName(e.target.value)}
             onKeyDownCapture={(e)=>{
               if(e.key.match("Enter")){
-                if(userName.length!=0){
+                if(userName.length!==0){
                 KeyRef.current.focus();
                 }
                 else{
@@ -105,6 +107,18 @@ export default function LoginPage({setLoggedIn}) {
           {errorMsg}
           </div>
         }
+      </div>
+{/*
+  app download link
+ */}
+    <div className="absolute -my-16 left-1/2 -translate-x-1/2 bottom-12 flex flex-row">
+      <h2 className='text-center text-white'>For Registeration Use Mobile Auth App <br/>
+         Click <a 
+         href={'http://localhost:8080/app'}
+         className={'text-cyan-600 underline'}
+         >here</a> to download.
+         </h2>
+         <img src={LinkQr} className="ml-4 w-16 h-16" />
       </div>
     </div>
   );

@@ -1,25 +1,123 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import NotificationBuilder from './NotificationBuilder';
 
-export default function MainPage(params) {
+import {Client} from '@stomp/stompjs';
+import SockJS from 'sockjs-client';
+var stompClient=null;
+const url="http://localhost:8080/ping";
+
+
+export default function MainPage({username}) {
     const [msg, setmsg] = useState('');
-    const [mouseOverLink, setmouseOverLink] = useState(false);
-    
-    const sendPing = () =>{
+
+    const [NotificationList, setNotificationList] = useState([
+        {
+          id:1,
+          type:'ping',
+          msg:''
+        },
+        {
+          id:2,
+          type:'msg',
+          msg:'wjkckj wmbcjwhbcik qhcqhuwvy'
+        }
+      ]);
+
+      const sendPing = () =>{
         console.log("pinged")
+        sendMsgToServer("type-ping",username);
     }
 
     const sendMsg = () =>{
         if(null!=msg && msg){
             console.log(msg);
+            sendMsgToServer(msg,username);
             setmsg('')
         }
     }
 
+
+ /**Stomp Client */
+ var msgUniqueKey=3;
+    
+ useEffect(() => {
+     const url = "http://localhost:8080/ping";
+     const sockjs = new SockJS(url);
+
+     stompClient = new Client({
+         webSocketFactory: () => sockjs,
+         connectHeaders: {},
+         debug: (str) => {
+             console.log(str);
+         },
+         onConnect: (frame) => {
+             console.log("Connected: ", frame);
+             // Subscribe to user's messages /user/msg/${userName}
+             stompClient.subscribe(`/topic`, (payload) => {
+                 const data = JSON.parse(payload.body);
+                   setNotificationList((prev) => [...prev, {
+                       id:msgUniqueKey++,
+                       type:data.msg===""?"ping":"msg",
+                       msg:data.msg
+                   }]);
+                 console.log("Received message: ", data);
+             });
+         },
+         onStompError: (error) => {
+             console.error("STOMP Error: ", error);
+         },
+         onWebSocketError: (error) => {
+             console.error("WebSocket Error: ", error);
+         },
+     });
+
+     // Activate the STOMP client
+     stompClient.activate();
+
+     // Clean up when component unmounts
+     return () => {
+         stompClient.deactivate();
+     };
+ }, []);
+
+ const sendMsgToServer = (data,userName) =>{
+  const dataToSend = {
+      userName: userName,
+      Type: data === "type-ping" ? "ping" : "msg",
+      msg: data === "type-ping" ? "" : data,
+  };
+  console.log("publish msg");
+ /*
+    stompClient.publish({
+        destination: "msg/msg",
+        body: JSON.stringify(dataToSend)
+    });
+  */
+   // Send a message
+   if (stompClient && stompClient.connected) {
+      console.log("Publishing message");
+      stompClient.publish({
+          destination: "/app/msg",
+          body: JSON.stringify(dataToSend)
+      });
+    } else {
+      console.error("STOMP client is not connected.");
+      //setting error notification
+      setNotificationList((prev) => [...prev, {
+        id:msgUniqueKey++,
+        type:"error",
+        msg:""
+        }]);
+    }
+}
+
+
     return(
         <div className='h-screen w-screen bg-lime-400'>
-
-        <NotificationBuilder/>
+        {/*
+          <msgReciever username={username} recieveMsg={recieveMsg}/>
+         */}
+        <NotificationBuilder NotificationList={NotificationList} setNotificationList={setNotificationList} />
 
         <div className='flex flex-col h-screen w-screen justify-center items-center'>
             <button className='text-3xl bg-lime-500 rounded-2xl p-1'
@@ -32,14 +130,7 @@ export default function MainPage(params) {
             onClick={sendMsg}
             >Send</button>
         </div>
-
-        <h2 className='absolute -my-16 left-1/2 -translate-x-1/2 text-center'>For Registeration Use Mobile Auth App <br/>
-         Click <a onMouseEnter={()=>setmouseOverLink(true)}
-            onMouseLeave={()=>setmouseOverLink(false)}
-         href={'http://localhost:8080/app'}
-         className={mouseOverLink?'text-cyan-600 underline':''}
-         >here</a> to download.
-         </h2>
         </div>
     )
 }
+

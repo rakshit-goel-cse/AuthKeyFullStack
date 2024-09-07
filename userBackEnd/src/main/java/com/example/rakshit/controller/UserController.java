@@ -124,6 +124,13 @@ public class UserController {
 				return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Authkey is not correct");
 			}
 			Users user = getUser(body.getUsername());
+			
+			//temp login for testing
+			
+			if(user.getUsername().equalsIgnoreCase("teste") || user.getUsername().equalsIgnoreCase("test")) {
+				return ResponseEntity.ok("loged in");
+			}
+			
 			if(null!=user && StringUtil.notNullNorEmpty(user.getPassword())) {
 				String key = user.getSecuritykey();
 				String finalKey=null;
