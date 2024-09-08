@@ -51,9 +51,9 @@ export default function MainPage({username}) {
              console.log(str);
          },
          onConnect: (frame) => {
-             console.log("Connected: ", frame);
+             console.log(`/user/${username}/web` +"Connected: ", frame);
              // Subscribe to user's messages /user/msg/${userName}
-             stompClient.subscribe(`/topic`, (payload) => {
+             stompClient.subscribe(`/user/${username}/web`, (payload) => {
                  const data = JSON.parse(payload.body);
                    setNotificationList((prev) => [...prev, {
                        id:msgUniqueKey++,
@@ -87,17 +87,11 @@ export default function MainPage({username}) {
       msg: data === "type-ping" ? "" : data,
   };
   console.log("publish msg");
- /*
-    stompClient.publish({
-        destination: "msg/msg",
-        body: JSON.stringify(dataToSend)
-    });
-  */
    // Send a message
    if (stompClient && stompClient.connected) {
       console.log("Publishing message");
       stompClient.publish({
-          destination: "/app/msg",
+          destination: "/ping/app",
           body: JSON.stringify(dataToSend)
       });
     } else {
