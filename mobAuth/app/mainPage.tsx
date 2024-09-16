@@ -4,7 +4,7 @@ import AuthTimer from "./timmer/authTimer";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { verifyUser } from "./server/userService";
 
-const timeGapInLogIn = 1000000;//1 * 24 * 60 * 60 * 1000; //1 day
+const timeGapInLogIn = 1 * 24 * 60 * 60 * 1000; //1 day
 export default function mainPage() {
   const [loggedIn, setloggedIn] = useState(false);
 

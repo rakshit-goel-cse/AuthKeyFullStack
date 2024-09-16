@@ -1,9 +1,10 @@
 
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useEffect, useState } from "react";
-import { StyleSheet, Text, View } from "react-native";
+import { StyleSheet, Text, View, TextInput } from "react-native";
 import { CountdownCircleTimer } from 'react-native-countdown-circle-timer';
 import { setAuthKey } from "../server/userService";
+import MsgArea from "./MsgArea";
 
 
 export default function AuthTimer({tryLogOut}) {
@@ -24,6 +25,11 @@ export default function AuthTimer({tryLogOut}) {
                     }
                     generateAuthCode(value[0][1],value[1][1]);
                 }
+
+                //create websocket
+                if(null!==userName && ""!==userName){
+
+                }
             }
             catch(error){
                 console.error(error);
@@ -35,7 +41,7 @@ export default function AuthTimer({tryLogOut}) {
     
 
     const generateAuthCode = async (userName,password) => {
-      console.log("generateAuthCode");
+      //console.log("generateAuthCode");
       if (null != userName && userName && null != password && password) {
         let key = Math.floor(100000 + Math.random() * 900000);
         await setAuthKey(userName, password, key.toString());
@@ -46,36 +52,40 @@ export default function AuthTimer({tryLogOut}) {
       return true;
     };
 
-    return(
-        <View style={style.container}>
-            <View style={style.nameContainer}>
-                <Text style={style.userNameText}>{userName}</Text>
-                <Text style={style.logOutStyle}
-                onPress={()=>tryLogOut()}
-                >LogOut</Text>
-            </View>
-            <CountdownCircleTimer
-            isPlaying
-            duration={10}
-            strokeWidth={10}
-            trailStrokeWidth={6}
-            isGrowing={true}
-            size={230}
-            colors={'#004777'}
-            onComplete={()=>{
-                    generateAuthCode(userName,password);
-                    return { shouldRepeat: true, delay: 0 }
-                }}
-            >
-                {()=>(
-                    <Text style={style.text}>{authCode}</Text>
-                )}
-            </CountdownCircleTimer>
+    return (
+      <View style={style.container}>
+        <View style={style.nameContainer}>
+          <Text style={style.userNameText}>{userName}</Text>
+          <Text style={style.logOutStyle} onPress={() => tryLogOut()}>
+            LogOut
+          </Text>
         </View>
-    )
+        <CountdownCircleTimer
+          isPlaying
+          duration={10}
+          strokeWidth={10}
+          trailStrokeWidth={6}
+          isGrowing={true}
+          size={230}
+          colors={"#004777"}
+          onComplete={() => {
+            generateAuthCode(userName, password);
+            return { shouldRepeat: true, delay: 0 };
+          }}
+        >
+          {() => <Text style={style.text}>{authCode}</Text>}
+        </CountdownCircleTimer>
+
+        {/*chat*/}
+        {null !== userName && "" !== userName && (
+          <MsgArea userName={userName} />
+        )}
+      </View>
+    );
 }
 
 const style = StyleSheet.create({
+   
     container: {    
       backgroundColor: "rgb(79, 181, 232)",
       height:"100%",

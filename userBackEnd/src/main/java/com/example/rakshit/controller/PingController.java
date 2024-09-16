@@ -32,6 +32,7 @@ public class PingController {
 	public MsgDTO pingToApp(@Payload MsgDTO msg) throws Exception {
 		log.info("Ping To APP"+msg.toString());
 		//throw new Exception("Controller issue");
+		//simpMsgTemp.setUserDestinationPrefix("/app");
 		simpMsgTemp.convertAndSendToUser(msg.getUserName(),"/app", msg);
 		return msg;
 	}

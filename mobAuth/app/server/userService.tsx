@@ -1,4 +1,3 @@
-import { useEffect, useState } from "react"
 const IP="192.168.29.231";
 export const verifyUser=async(userName,password) =>{
     
@@ -45,7 +44,7 @@ export const registerUser=async(userName,password) =>{
 
 export const setAuthKey=async(username,password,authKey)=>{
     try{
-        console.log("setauthCode- ",authKey);
+        //console.log("setauthCode- ",authKey);
         const url=`http://${IP}:8080/user/authKey?userName=${username}&password=${password}&authkey=${authKey}`;
     await fetch(url,
         {
